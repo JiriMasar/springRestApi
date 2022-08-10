@@ -12,9 +12,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @RestController()
 @RequestMapping("/api/v1")
@@ -41,25 +44,25 @@ public class LoginController {
     }
 
     @PostMapping("/auth")
-    public ResponseEntity<Object> login(@RequestBody JwtRequest jwtRequest) {
+    public ResponseEntity<Object> login(@RequestBody @Valid JwtRequest jwtRequest) {
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            jwtRequest.username(),
+                            jwtRequest.email(),
                             jwtRequest.password()
                     )
             );
-        } catch (BadCredentialsException e) {
+        } catch (InternalAuthenticationServiceException e) {
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
                     .body(new ErrorResponse(
-                            "Invalid password or username",
+                            e.getMessage(),
                             ErrorCodes.UNAUTHORIZED,
                             HttpStatus.UNAUTHORIZED.value()
                     ));
         }
 
-        var userDetails = userService.getByEmail(jwtRequest.username());
+        var userDetails = userService.getByEmail(jwtRequest.email());
         String token = jwtUtils.generateToken(userDetails);
         String refreshToken = jwtRefreshUtils.generateToken(userDetails);
         var userResponse = new UserResponse(

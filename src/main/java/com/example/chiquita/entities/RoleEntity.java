@@ -41,4 +41,3 @@ public class RoleEntity {
         this.role = role;
     }
 }
-

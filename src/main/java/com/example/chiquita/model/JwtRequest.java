@@ -1,4 +1,13 @@
 package com.example.chiquita.model;
 
-public record JwtRequest(String username, String password) {
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
+
+public record JwtRequest(
+        @NotEmpty
+        @Email
+        String email,
+        @NotEmpty
+        String password
+) {
 }

@@ -7,12 +7,12 @@ import com.example.chiquita.repositories.UserRepository;
 import com.example.chiquita.requests.RegisterRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -39,17 +39,22 @@ public class UserService {
 
     @Transactional
     public UserEntity saveUser(RegisterRequest registerRequest) {
-        var userEntity = new UserEntity();
-//        BeanUtils.copyProperties(registerRequest, userEntity);
-        userEntity.setEmail(registerRequest.email());
-        userEntity.setActive(true);
-        userEntity.setFirstName(registerRequest.firstName());
-        userEntity.setLastName(registerRequest.lastName());
-        userEntity.setPassword(passwordEncoder.encode(registerRequest.password()));
+        UserEntity user = new UserEntity();
 
-        var roleEntity = roleRepository.findByRole("USER_BASIC");
-        userEntity.setRoles(new HashSet<RoleEntity>(Collections.singletonList(roleEntity)));
+        user.setEmail(registerRequest.email());
+        user.setActive(true);
+        user.setFirstName(registerRequest.firstName());
+        user.setLastName(registerRequest.lastName());
+        user.setPassword(passwordEncoder.encode(registerRequest.password()));
 
-        return userRepository.save(userEntity);
+        RoleEntity userRole = roleRepository.findByRole("USER_BASIC");
+        user.setRoles(new HashSet<RoleEntity>(Collections.singletonList(userRole)));
+
+        return userRepository.save(user);
+    }
+
+    public UserEntity getById(UUID id) throws Exception {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new Exception(String.format("Cannot find [%s] user", id)));
     }
 }

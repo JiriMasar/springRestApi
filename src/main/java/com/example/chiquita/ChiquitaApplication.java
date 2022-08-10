@@ -43,8 +43,8 @@ public class ChiquitaApplication {
             try {
                 roleRepository.saveAll(List.of(
                         new RoleEntity("ADMIN"),
-                        new RoleEntity("ADMIN_BASIC"),
-                        new RoleEntity("ADMIN_ADVANCED")
+                        new RoleEntity("USER_BASIC"),
+                        new RoleEntity("USER_ADVANCED")
                 ));
             } catch (Exception e) {
 
